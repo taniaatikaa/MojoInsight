@@ -1,6 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { KkFormModal } from "./kk-form-modal";
+
+export type AnggotaDetail = {
+  id: string;
+  nama: string;
+  statusHubungan: string;
+  jenisKelamin: "L" | "P";
+  tanggalLahir: string;
+  pekerjaan: string | null;
+};
 
 export type KkRow = {
   id: string;
@@ -8,6 +19,7 @@ export type KkRow = {
   rtId: number;
   namaKepala: string;
   jumlahAnggota: number;
+  anggota: AnggotaDetail[];
 };
 
 const PAGE_SIZE = 10;
@@ -71,6 +83,24 @@ function IconChevronRight() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
+function IconPlus() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}
+
+function IconEdit() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   );
 }
@@ -169,10 +199,17 @@ export function KkTable({
   isSuperAdmin: boolean;
   rtId: number | null;
 }) {
+  const router = useRouter();
   const lockedRtId = isSuperAdmin ? null : rtId;
   const [search, setSearch] = useState("");
   const [rtFilter, setRtFilter] = useState(lockedRtId ?? 0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalState, setModalState] = useState<{ mode: "add" } | { mode: "edit"; row: KkRow } | null>(null);
+
+  function handleSaved() {
+    setModalState(null);
+    router.refresh();
+  }
 
   const filterKey = `${search}|${rtFilter}`;
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
@@ -206,6 +243,15 @@ export function KkTable({
             {lockedRtId ? `Menampilkan data RT ${String(lockedRtId).padStart(2, "0")} saja` : "Menampilkan seluruh data RW 13"}
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setModalState({ mode: "add" })}
+          className="flex flex-shrink-0 items-center gap-1.5 rounded-[10px] bg-brand-green px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_12px_rgba(0,70,23,0.25)] transition-colors hover:bg-brand-green-hover"
+        >
+          <IconPlus />
+          Tambah KK
+        </button>
       </div>
 
       <div className="mb-5 flex flex-wrap gap-3">
@@ -294,6 +340,9 @@ export function KkTable({
                     <th className="px-4 py-3 text-center text-[11px] font-bold tracking-wider text-brand-muted uppercase">
                       Jumlah Anggota
                     </th>
+                    <th className="px-4 py-3 text-center text-[11px] font-bold tracking-wider text-brand-muted uppercase">
+                      Aksi
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -314,6 +363,16 @@ export function KkTable({
                       <td className="px-4 py-3.5 text-center">
                         <span className="text-lg font-extrabold text-brand-ink tabular-nums">{row.jumlahAnggota}</span>{" "}
                         <span className="text-[11px] font-medium text-brand-muted">jiwa</span>
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setModalState({ mode: "edit", row })}
+                          aria-label={`Edit data KK ${row.namaKepala}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand-border text-brand-muted transition-colors hover:border-brand-green hover:bg-brand-bg-alt hover:text-brand-green"
+                        >
+                          <IconEdit />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -336,9 +395,19 @@ export function KkTable({
                     <RtBadge rtId={row.rtId} />
                   </div>
                   <p className="mb-2.5 text-[15px] leading-tight font-bold text-brand-ink">{row.namaKepala}</p>
-                  <div className="flex items-baseline gap-1 border-t border-brand-bg-alt pt-2.5">
-                    <span className="text-xl font-extrabold text-brand-green tabular-nums">{row.jumlahAnggota}</span>
-                    <span className="text-xs font-medium text-brand-muted">anggota keluarga</span>
+                  <div className="flex items-center justify-between gap-2 border-t border-brand-bg-alt pt-2.5">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl font-extrabold text-brand-green tabular-nums">{row.jumlahAnggota}</span>
+                      <span className="text-xs font-medium text-brand-muted">anggota keluarga</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setModalState({ mode: "edit", row })}
+                      aria-label={`Edit data KK ${row.namaKepala}`}
+                      className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-brand-border text-brand-muted transition-colors hover:border-brand-green hover:bg-brand-bg-alt hover:text-brand-green"
+                    >
+                      <IconEdit />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -348,6 +417,17 @@ export function KkTable({
       </div>
 
       {!isEmpty && <Pagination current={page} totalItems={filtered.length} onChange={setCurrentPage} />}
+
+      {modalState && (
+        <KkFormModal
+          key={modalState.mode === "edit" ? modalState.row.id : "add"}
+          mode={modalState.mode}
+          lockedRtId={lockedRtId}
+          initial={modalState.mode === "edit" ? modalState.row : undefined}
+          onClose={() => setModalState(null)}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 }

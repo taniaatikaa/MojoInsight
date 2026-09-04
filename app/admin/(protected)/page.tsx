@@ -7,8 +7,12 @@ export const metadata: Metadata = {
 };
 
 type AnggotaRow = {
+  id: string;
   nama: string;
   status_hubungan: string;
+  jenis_kelamin: "L" | "P";
+  tanggal_lahir: string;
+  pekerjaan: string | null;
   status_kependudukan: "Aktif" | "Meninggal" | "Pindah";
 };
 
@@ -25,7 +29,9 @@ export default async function AdminKkPage() {
   const [{ data: keluargaData }, { data: isSuperAdmin }, { data: rtId }] = await Promise.all([
     supabase
       .from("keluarga")
-      .select("id, no_kk, rt_id, anggota_keluarga(nama, status_hubungan, status_kependudukan)")
+      .select(
+        "id, no_kk, rt_id, anggota_keluarga(id, nama, status_hubungan, jenis_kelamin, tanggal_lahir, pekerjaan, status_kependudukan)",
+      )
       .order("rt_id")
       .order("no_kk")
       .returns<KeluargaRow[]>(),
@@ -42,6 +48,14 @@ export default async function AdminKkPage() {
       rtId: k.rt_id,
       namaKepala: kepala?.nama ?? "—",
       jumlahAnggota: aktif.length,
+      anggota: aktif.map((a) => ({
+        id: a.id,
+        nama: a.nama,
+        statusHubungan: a.status_hubungan,
+        jenisKelamin: a.jenis_kelamin,
+        tanggalLahir: a.tanggal_lahir,
+        pekerjaan: a.pekerjaan,
+      })),
     };
   });
 
