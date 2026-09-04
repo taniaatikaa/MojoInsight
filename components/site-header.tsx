@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export function SiteHeader() {
+export function SiteHeader({ active }: { active?: "struktur" }) {
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-white/92 backdrop-blur-md">
       <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between px-6">
@@ -15,7 +15,11 @@ export function SiteHeader() {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
             href="/struktur"
-            className="text-xs font-semibold whitespace-nowrap text-brand-ink/80 transition-colors hover:text-brand-green sm:text-sm"
+            className={`text-xs whitespace-nowrap transition-colors sm:text-sm ${
+              active === "struktur"
+                ? "border-b-2 border-brand-green pb-0.5 font-bold text-brand-green"
+                : "font-semibold text-brand-ink/80 hover:text-brand-green"
+            }`}
           >
             Struktur Pengurus
           </Link>
