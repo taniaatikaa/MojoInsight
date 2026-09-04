@@ -1,0 +1,3 @@
+// Kawung batik motif, tiled as a background pattern across brand sections.
+export const KAWUNG_TILE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cellipse cx='28' cy='7' rx='7' ry='9' fill='none' stroke='%23004617' stroke-width='0.7' opacity='0.18'/%3E%3Cellipse cx='28' cy='49' rx='7' ry='9' fill='none' stroke='%23004617' stroke-width='0.7' opacity='0.18'/%3E%3Cellipse cx='7' cy='28' rx='9' ry='7' fill='none' stroke='%23004617' stroke-width='0.7' opacity='0.18'/%3E%3Cellipse cx='49' cy='28' rx='9' ry='7' fill='none' stroke='%23004617' stroke-width='0.7' opacity='0.18'/%3E%3Ccircle cx='28' cy='28' r='3' fill='none' stroke='%23004617' stroke-width='0.6' opacity='0.13'/%3E%3C/svg%3E";

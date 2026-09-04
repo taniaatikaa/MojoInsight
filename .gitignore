@@ -44,3 +44,7 @@ next-env.d.ts
 # raw population data (real names/birthdates) — never commit, even though DOCS/ is tracked
 /DOCS/KK-Excel/
 /DOCS/KK-Data-Preview.md
+
+# raw working materials (Figma Make export carries its own AGENTS.md/CLAUDE.md/.figma tool files —
+# never commit) — reference only, rebuilt as real Next.js components per milestone
+/NEEDS/
