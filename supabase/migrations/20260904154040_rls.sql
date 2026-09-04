@@ -1,17 +1,5 @@
 -- Helper functions: security definer + stable, so a plain authenticated user
 -- can evaluate whitelist membership without direct SELECT rights on admin_users.
-create function public.current_admin()
-returns public.admin_users
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  select * from public.admin_users
-  where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
-  limit 1;
-$$;
-
 create function public.is_admin()
 returns boolean
 language sql
