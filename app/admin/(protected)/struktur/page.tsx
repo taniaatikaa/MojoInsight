@@ -1,24 +1,35 @@
 import type { Metadata } from "next";
+import { PengurusTable, type PengurusAdminRow } from "@/components/admin/pengurus-table";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Struktur Pengurus — Admin MojoInsight",
 };
 
-export default function AdminStrukturPage() {
-  return (
-    <div className="flex flex-col items-center gap-4 px-6 py-20 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-bg-alt text-brand-muted">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-      </div>
-      <div>
-        <p className="mb-1.5 text-lg font-bold text-brand-ink">Struktur Pengurus</p>
-        <p className="text-[13px] text-brand-muted">CRUD Kepala Dukuh &amp; Ketua RT dibangun di Milestone 8.</p>
-      </div>
-    </div>
-  );
+type PengurusQueryRow = {
+  id: string;
+  nama: string;
+  jabatan: string;
+  foto_path: string | null;
+  urutan: number | null;
+};
+
+export default async function AdminStrukturPage() {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("pengurus")
+    .select("id, nama, jabatan, foto_path, urutan")
+    .order("urutan", { ascending: true, nullsFirst: false })
+    .returns<PengurusQueryRow[]>();
+
+  const rows: PengurusAdminRow[] = (data ?? []).map((p) => ({
+    id: p.id,
+    nama: p.nama,
+    jabatan: p.jabatan,
+    urutan: p.urutan,
+    fotoUrl: p.foto_path ? supabase.storage.from("pengurus-photos").getPublicUrl(p.foto_path).data.publicUrl : null,
+  }));
+
+  return <PengurusTable rows={rows} />;
 }
