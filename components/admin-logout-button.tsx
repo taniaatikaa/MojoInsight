@@ -16,8 +16,13 @@ export function AdminLogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="rounded-lg border-[1.5px] border-brand-border px-4 py-2 text-sm font-semibold text-brand-ink transition-colors hover:border-brand-green hover:text-brand-green"
+      className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13px] font-semibold text-white/50 transition-colors hover:bg-red-500/12 hover:text-red-300"
     >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
       Keluar
     </button>
   );
