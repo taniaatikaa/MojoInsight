@@ -9,7 +9,13 @@ export type HeroStats = {
   kematian_tahun_berjalan: number;
 };
 
-const LOCATIONS = ["RW 13", "Desa Ngeposari", "Kec. Semanu", "Kab. Gunung Kidul", "D.I. Yogyakarta"];
+const LOCATIONS = [
+  "RW 13",
+  "Desa Ngeposari",
+  "Kec. Semanu",
+  "Kab. Gunung Kidul",
+  "D.I. Yogyakarta",
+];
 
 function StatCards({ stats }: { stats: HeroStats }) {
   const year = new Date().getFullYear();
@@ -40,7 +46,9 @@ function StatCards({ stats }: { stats: HeroStats }) {
       sublabel: `Tahun ${year}`,
       value: stats.kelahiran_tahun_berjalan,
       color: "var(--color-brand-lime)",
-      icon: <path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4Z" />,
+      icon: (
+        <path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4Z" />
+      ),
     },
     {
       id: "mati",
@@ -66,7 +74,10 @@ function StatCards({ stats }: { stats: HeroStats }) {
           key={c.id}
           className="relative overflow-hidden rounded-2xl border border-brand-border bg-white p-5 shadow-[0_8px_32px_rgba(0,70,23,0.15),0_2px_8px_rgba(0,0,0,0.05)]"
         >
-          <div className="absolute top-0 right-0 left-0 h-[3px]" style={{ background: c.color }} />
+          <div
+            className="absolute top-0 right-0 left-0 h-[3px]"
+            style={{ background: c.color }}
+          />
           <svg
             width="22"
             height="22"
@@ -83,7 +94,9 @@ function StatCards({ stats }: { stats: HeroStats }) {
           <div className="mb-2 text-[clamp(28px,3.5vw,40px)] leading-none font-extrabold tracking-tight text-brand-ink">
             <StatCounter value={c.value} />
           </div>
-          <p className="mb-0.5 text-[13px] font-bold text-brand-ink">{c.label}</p>
+          <p className="mb-0.5 text-[13px] font-bold text-brand-ink">
+            {c.label}
+          </p>
           <p className="text-[11px] text-brand-muted">{c.sublabel}</p>
         </div>
       ))}
@@ -100,14 +113,20 @@ export function HeroSection({ stats }: { stats: HeroStats }) {
       >
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(160deg, rgba(0,70,23,0.96) 0%, rgba(0,40,12,0.90) 100%)" }}
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(0,70,23,0.96) 0%, rgba(0,40,12,0.90) 100%)",
+          }}
         />
 
         <div className="relative mx-auto max-w-6xl px-6 pt-18">
           <div className="mb-6 flex items-center gap-2">
             <div className="flex gap-1">
               {["bg-brand-green", "bg-brand-lime", "bg-brand-gold"].map((c) => (
-                <div key={c} className={`h-4 w-1.5 rounded-full opacity-85 ${c}`} />
+                <div
+                  key={c}
+                  className={`h-4 w-1.5 rounded-full opacity-85 ${c}`}
+                />
               ))}
             </div>
             <span className="text-[10px] font-bold tracking-[0.22em] text-brand-lime/90 uppercase">
@@ -123,8 +142,8 @@ export function HeroSection({ stats }: { stats: HeroStats }) {
             </h1>
 
             <p className="mb-2.5 text-[clamp(14px,1.6vw,17px)] leading-relaxed text-white/65">
-              Sistem informasi kependudukan resmi yang menyajikan data demografi warga secara
-              terbuka, akurat, dan mudah dipahami.
+              Sistem informasi kependudukan resmi yang menyajikan data demografi
+              warga secara terbuka, akurat, dan mudah dipahami.
             </p>
 
             <p className="flex flex-wrap items-center gap-2 text-xs font-medium text-white/45">

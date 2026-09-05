@@ -18,7 +18,12 @@ export type RtSummaryRow = {
 
 const VillageMapLeaflet = dynamic(
   () => import("./village-map-leaflet").then((m) => m.VillageMapLeaflet),
-  { ssr: false, loading: () => <div className="h-[420px] w-full animate-pulse bg-brand-bg-alt" /> },
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[420px] w-full animate-pulse bg-brand-bg-alt" />
+    ),
+  },
 );
 
 export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
@@ -41,11 +46,19 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
               Peta Wilayah RW 13
             </h2>
             <p className="mt-2 text-[15px] leading-relaxed text-brand-muted">
-              Pilih RT pada peta atau daftar di bawah untuk melihat detail wilayah.
+              Pilih RT pada peta atau daftar di bawah untuk melihat detail
+              wilayah.
             </p>
           </div>
-          <div className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-brand-border bg-white/80 px-3 py-2 text-xs font-semibold text-brand-muted">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-brand-border bg-white/80 px-3 py-2 text-xs font-semibold text-brand-muted z-12">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="10" r="3" />
               <path d="M12 2a8 8 0 0 1 8 8c0 5.25-8 14-8 14S4 15.25 4 10a8 8 0 0 1 8-8z" />
             </svg>
@@ -55,8 +68,12 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
 
         <BatikDivider />
 
-        <div className="mt-7 overflow-hidden rounded-2xl border border-brand-border shadow-[0_4px_24px_rgba(0,70,23,0.1)]">
-          <VillageMapLeaflet rtList={rtList} selected={selected} onSelect={setSelected} />
+        <div className="isolate mt-7 overflow-hidden rounded-2xl border border-brand-border shadow-[0_4px_24px_rgba(0,70,23,0.1)]">
+          <VillageMapLeaflet
+            rtList={rtList}
+            selected={selected}
+            onSelect={setSelected}
+          />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
@@ -75,22 +92,37 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
                 <div className="mb-2 flex items-center gap-2">
                   <div
                     className={`flex h-6 w-6 items-center justify-center rounded-md border ${
-                      isActive ? "border-white/40 bg-white/20" : "border-brand-border bg-brand-bg-alt"
+                      isActive
+                        ? "border-white/40 bg-white/20"
+                        : "border-brand-border bg-brand-bg-alt"
                     }`}
                   >
-                    <span className={`text-[10px] font-extrabold ${isActive ? "text-white" : "text-brand-green"}`}>
+                    <span
+                      className={`text-[10px] font-extrabold ${isActive ? "text-white" : "text-brand-green"}`}
+                    >
                       {rt.rt_id}
                     </span>
                   </div>
-                  <span className={`text-[11px] font-bold ${isActive ? "text-white/70" : "text-brand-muted"}`}>
+                  <span
+                    className={`text-[11px] font-bold ${isActive ? "text-white/70" : "text-brand-muted"}`}
+                  >
                     RT {rt.rt_id.toString().padStart(2, "0")}
                   </span>
                 </div>
-                <p className={`mb-0.5 text-[15px] leading-none font-extrabold ${isActive ? "text-white" : "text-brand-ink"}`}>
+                <p
+                  className={`mb-0.5 text-[15px] leading-none font-extrabold ${isActive ? "text-white" : "text-brand-ink"}`}
+                >
                   {rt.jumlah_jiwa}
-                  <span className="ml-0.5 text-[10px] font-medium opacity-70"> jiwa</span>
+                  <span className="ml-0.5 text-[10px] font-medium opacity-70">
+                    {" "}
+                    jiwa
+                  </span>
                 </p>
-                <p className={`text-[11px] ${isActive ? "text-white/55" : "text-brand-muted"}`}>{rt.jumlah_kk} KK</p>
+                <p
+                  className={`text-[11px] ${isActive ? "text-white/55" : "text-brand-muted"}`}
+                >
+                  {rt.jumlah_kk} KK
+                </p>
               </button>
             );
           })}
@@ -111,7 +143,9 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
                   <h3 className="text-xl font-extrabold tracking-tight text-white">
                     RT {selectedRt.rt_id.toString().padStart(2, "0")} — RW 13
                   </h3>
-                  <p className="mt-0.5 text-xs text-white/55">Dusun Mojo · Desa Ngeposari</p>
+                  <p className="mt-0.5 text-xs text-white/55">
+                    Dusun Mojo · Desa Ngeposari
+                  </p>
                 </div>
                 <button
                   onClick={() => setSelected(null)}
@@ -125,8 +159,16 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
             <div className="p-6">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
-                  { label: "Total Jiwa", value: selectedRt.jumlah_jiwa.toLocaleString("id-ID"), color: "text-brand-green" },
-                  { label: "Total KK", value: selectedRt.jumlah_kk.toLocaleString("id-ID"), color: "text-brand-blue" },
+                  {
+                    label: "Total Jiwa",
+                    value: selectedRt.jumlah_jiwa.toLocaleString("id-ID"),
+                    color: "text-brand-green",
+                  },
+                  {
+                    label: "Total KK",
+                    value: selectedRt.jumlah_kk.toLocaleString("id-ID"),
+                    color: "text-brand-blue",
+                  },
                   {
                     label: "Pekerjaan Dominan",
                     value: selectedRt.pekerjaan_dominan ?? "Belum ada data",
@@ -134,11 +176,16 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
                     small: true,
                   },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-xl border border-brand-border bg-brand-bg p-3.5">
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-brand-border bg-brand-bg p-3.5"
+                  >
                     <p className="mb-1.5 text-[10px] font-semibold tracking-[0.12em] text-brand-muted uppercase">
                       {item.label}
                     </p>
-                    <p className={`font-extrabold tracking-tight ${item.color} ${item.small ? "text-sm" : "text-[22px]"}`}>
+                    <p
+                      className={`font-extrabold tracking-tight ${item.color} ${item.small ? "text-sm" : "text-[22px]"}`}
+                    >
                       {item.value}
                     </p>
                   </div>

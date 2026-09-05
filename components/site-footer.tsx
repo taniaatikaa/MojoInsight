@@ -19,8 +19,12 @@ export function SiteFooter() {
         <div className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="mb-2 flex items-baseline gap-0.5">
-              <span className="text-[22px] font-extrabold tracking-tight text-white">Mojo</span>
-              <span className="text-[22px] font-medium tracking-tight text-brand-lime">Insight</span>
+              <span className="text-[22px] font-extrabold tracking-tight text-white">
+                Mojo
+              </span>
+              <span className="text-[22px] font-medium tracking-tight text-brand-lime">
+                Insight
+              </span>
             </div>
             <p className="max-w-[280px] text-xs leading-relaxed text-white/50">
               Portal Informasi Kependudukan Resmi
@@ -32,7 +36,9 @@ export function SiteFooter() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="mb-1 text-[10px] font-bold tracking-[0.18em] text-brand-lime/70 uppercase">Tautan</p>
+            <p className="mb-1 text-[10px] font-bold tracking-[0.18em] text-brand-lime/70 uppercase">
+              Tautan
+            </p>
             {LINKS.map((link) => (
               <Link
                 key={link.label}
@@ -49,18 +55,25 @@ export function SiteFooter() {
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[11px] leading-relaxed text-white/35">
-            Platform data kependudukan resmi Dusun Mojo. Seluruh data bersumber dari administrasi
-            dusun dan diperbarui secara berkala oleh petugas yang berwenang.
+            Platform data kependudukan resmi Dusun Mojo. Seluruh data bersumber
+            dari administrasi dusun dan diperbarui secara berkala oleh petugas
+            yang berwenang.
           </p>
           <div className="flex flex-shrink-0 gap-1.5">
-            {["bg-brand-green", "bg-brand-lime", "bg-brand-gold", "bg-brand-blue"].map((c) => (
+            {[
+              "bg-brand-green",
+              "bg-brand-lime",
+              "bg-brand-gold",
+              "bg-brand-blue",
+            ].map((c) => (
               <div key={c} className={`h-4 w-4 rounded-full opacity-75 ${c}`} />
             ))}
           </div>
         </div>
 
         <p className="mt-4 text-[10px] text-white/20">
-          © {new Date().getFullYear()} Pemerintah Dusun Mojo · MojoInsight
+          © {new Date().getFullYear()} Pemerintah Dusun Mojo · KKN UII
+          Yogyakarta Angkatan 73 · Unit 115 Ngeposari
         </p>
       </div>
     </footer>
