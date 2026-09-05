@@ -13,8 +13,21 @@ export type RtSummaryRow = {
   longitude: number;
   jumlah_kk: number;
   jumlah_jiwa: number;
+  jumlah_laki: number;
+  jumlah_perempuan: number;
+  jumlah_pelajar: number;
   pekerjaan_dominan: string | null;
 };
+
+export type RtAgeBracketRow = { rt_id: number; bracket: string; jumlah: number };
+export type RtPekerjaanRow = { rt_id: number; pekerjaan: string; jumlah: number };
+
+const AGE_BRACKET_META: Record<string, { label: string; color: string }> = {
+  "0-14": { label: "Usia Belajar", color: "var(--color-brand-lime)" },
+  "15-59": { label: "Usia Produktif", color: "var(--color-brand-green)" },
+  "60+": { label: "Lansia", color: "var(--color-brand-gold)" },
+};
+const AGE_BRACKET_ORDER = ["0-14", "15-59", "60+"];
 
 const VillageMapLeaflet = dynamic(
   () => import("./village-map-leaflet").then((m) => m.VillageMapLeaflet),
@@ -26,9 +39,30 @@ const VillageMapLeaflet = dynamic(
   },
 );
 
-export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
+export function VillageMapSection({
+  rtList,
+  ageByRt,
+  pekerjaanByRt,
+}: {
+  rtList: RtSummaryRow[];
+  ageByRt: RtAgeBracketRow[];
+  pekerjaanByRt: RtPekerjaanRow[];
+}) {
   const [selected, setSelected] = useState<number | null>(null);
   const selectedRt = rtList.find((rt) => rt.rt_id === selected) ?? null;
+
+  const selectedAge = selected
+    ? AGE_BRACKET_ORDER.map((bracket) => ({
+        bracket,
+        jumlah: ageByRt.find((a) => a.rt_id === selected && a.bracket === bracket)?.jumlah ?? 0,
+        ...AGE_BRACKET_META[bracket],
+      }))
+    : [];
+  const selectedAgeTotal = selectedAge.reduce((sum, b) => sum + b.jumlah, 0);
+
+  const selectedPekerjaan = selected
+    ? pekerjaanByRt.filter((p) => p.rt_id === selected).sort((a, b) => b.jumlah - a.jumlah)
+    : [];
 
   return (
     <section
@@ -170,6 +204,16 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
                     color: "text-brand-blue",
                   },
                   {
+                    label: "Rasio L / P",
+                    value: `${selectedRt.jumlah_laki.toLocaleString("id-ID")} / ${selectedRt.jumlah_perempuan.toLocaleString("id-ID")}`,
+                    color: "text-brand-ink",
+                  },
+                  {
+                    label: "Jumlah Pelajar",
+                    value: selectedRt.jumlah_pelajar.toLocaleString("id-ID"),
+                    color: "text-brand-gold",
+                  },
+                  {
                     label: "Pekerjaan Dominan",
                     value: selectedRt.pekerjaan_dominan ?? "Belum ada data",
                     color: "text-brand-muted",
@@ -190,6 +234,53 @@ export function VillageMapSection({ rtList }: { rtList: RtSummaryRow[] }) {
                     </p>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-brand-border bg-brand-bg p-4">
+                  <p className="mb-3 text-[10px] font-semibold tracking-[0.12em] text-brand-muted uppercase">
+                    Distribusi Usia
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {selectedAge.map((b) => {
+                      const pct = selectedAgeTotal > 0 ? Math.round((b.jumlah / selectedAgeTotal) * 100) : 0;
+                      return (
+                        <div key={b.bracket}>
+                          <div className="mb-1 flex items-center justify-between text-xs">
+                            <span className="font-semibold text-brand-ink">{b.label}</span>
+                            <span className="font-bold" style={{ color: b.color }}>
+                              {b.jumlah} · {pct}%
+                            </span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-brand-border/50">
+                            <div
+                              className="h-1.5 rounded-full transition-[width]"
+                              style={{ width: `${pct}%`, background: b.color }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-brand-border bg-brand-bg p-4">
+                  <p className="mb-3 text-[10px] font-semibold tracking-[0.12em] text-brand-muted uppercase">
+                    Daftar Pekerjaan
+                  </p>
+                  {selectedPekerjaan.length === 0 ? (
+                    <p className="text-xs text-brand-muted">Belum ada data.</p>
+                  ) : (
+                    <div className="flex max-h-[168px] flex-col gap-2 overflow-y-auto pr-1">
+                      {selectedPekerjaan.map((p) => (
+                        <div key={p.pekerjaan} className="flex items-center justify-between gap-3 text-xs">
+                          <span className="truncate text-brand-ink">{p.pekerjaan}</span>
+                          <span className="flex-shrink-0 font-bold text-brand-green">{p.jumlah}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

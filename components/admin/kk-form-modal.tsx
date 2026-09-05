@@ -4,8 +4,34 @@ import { useEffect, useState, useTransition } from "react";
 import { saveKeluarga, type SaveAnggotaInput } from "@/app/admin/(protected)/kk-actions";
 import { HUBUNGAN_OPTIONS } from "@/lib/hubungan-list";
 import { PEKERJAAN_LIST } from "@/lib/pekerjaan-list";
+import { createClient } from "@/lib/supabase/client";
 import type { AnggotaDetail, KkRow } from "./kk-table";
 import { SearchableCombobox } from "./searchable-combobox";
+
+function useDuplicateWarning(nama: string, tanggalLahir: string, excludeId: string | undefined) {
+  const [isDuplicate, setIsDuplicate] = useState(false);
+
+  useEffect(() => {
+    if (!nama.trim() || !tanggalLahir) return;
+
+    const supabase = createClient();
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const { data } = await supabase.rpc("check_duplikat_anggota", {
+        p_nama: nama.trim(),
+        p_tanggal_lahir: tanggalLahir,
+        p_exclude_id: excludeId ?? null,
+      });
+      if (!cancelled) setIsDuplicate(!!data);
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [nama, tanggalLahir, excludeId]);
+
+  return isDuplicate && !!nama.trim() && !!tanggalLahir;
+}
 
 let uidCounter = 0;
 function nextUid() {
@@ -113,6 +139,8 @@ function AnggotaRow({
   onChange: (partial: Partial<FormAnggota>) => void;
   onDelete: () => void;
 }) {
+  const isDuplicate = useDuplicateWarning(anggota.nama, anggota.tanggalLahir, anggota.id);
+
   return (
     <div className="mb-3 overflow-hidden rounded-[14px] border border-brand-border bg-[#FAFCF8]">
       <div className="flex items-center justify-between border-b border-brand-bg-alt px-4 py-2.5">
@@ -178,6 +206,15 @@ function AnggotaRow({
             ariaLabel="Pekerjaan"
           />
         </FormField>
+
+        {isDuplicate && (
+          <div
+            role="alert"
+            className="rounded-lg border border-brand-gold bg-[#FFFBEB] px-3 py-2 text-[12px] font-semibold text-[#92400E] sm:col-span-2"
+          >
+            ⚠ Sudah ada anggota lain dengan nama & tanggal lahir yang sama. Cek dulu sebelum lanjut, kalau memang orang berbeda tetap bisa disimpan.
+          </div>
+        )}
       </div>
     </div>
   );

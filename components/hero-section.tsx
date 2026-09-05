@@ -7,7 +7,17 @@ export type HeroStats = {
   total_jiwa: number;
   kelahiran_tahun_berjalan: number;
   kematian_tahun_berjalan: number;
+  last_updated_at: string | null;
 };
+
+function formatUpdatedAt(iso: string | null) {
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 const LOCATIONS = [
   "RW 13",
@@ -105,6 +115,8 @@ function StatCards({ stats }: { stats: HeroStats }) {
 }
 
 export function HeroSection({ stats }: { stats: HeroStats }) {
+  const updatedAt = formatUpdatedAt(stats.last_updated_at);
+
   return (
     <>
       <section
@@ -172,6 +184,7 @@ export function HeroSection({ stats }: { stats: HeroStats }) {
         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-lime" />
         <p className="text-[11px] font-medium text-brand-muted">
           Data diperbarui otomatis · Sumber: Administrasi Dusun Mojo
+          {updatedAt && <> · Terakhir diperbarui {updatedAt}</>}
         </p>
       </div>
     </>

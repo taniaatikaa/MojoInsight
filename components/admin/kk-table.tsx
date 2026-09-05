@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 import { KkFormModal } from "./kk-form-modal";
 
 export type AnggotaDetail = {
@@ -94,6 +95,70 @@ function IconPlus() {
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
+}
+
+function IconDownload() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
+function exportToExcel(rows: KkRow[]) {
+  const flat: Record<string, string | number>[] = [];
+  let no = 1;
+  for (const row of rows) {
+    for (const a of row.anggota) {
+      flat.push({
+        No: no++,
+        RT: row.rtId,
+        "No. KK": row.noKk ?? "",
+        "Nama Anggota Keluarga": a.nama,
+        "Status Hubungan": a.statusHubungan,
+        "Jenis Kelamin": a.jenisKelamin,
+        "Tanggal Lahir": a.tanggalLahir,
+        Pekerjaan: a.pekerjaan ?? "",
+        "Status Kependudukan": "Aktif",
+        Catatan: "",
+      });
+    }
+  }
+
+  const sheet = XLSX.utils.json_to_sheet(flat);
+  const range = XLSX.utils.decode_range(sheet["!ref"] ?? "A1:A1");
+  for (let r = range.s.r + 1; r <= range.e.r; r++) {
+    const noKkCell = sheet[XLSX.utils.encode_cell({ r, c: 2 })];
+    if (noKkCell) {
+      noKkCell.t = "s";
+      noKkCell.z = "@";
+    }
+    const tanggalCell = sheet[XLSX.utils.encode_cell({ r, c: 6 })];
+    if (tanggalCell) {
+      tanggalCell.t = "d";
+      tanggalCell.v = new Date(tanggalCell.v as string);
+      tanggalCell.z = "m/d/yy";
+    }
+  }
+  sheet["!cols"] = [
+    { wch: 5 },
+    { wch: 5 },
+    { wch: 20 },
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 6 },
+    { wch: 12 },
+    { wch: 22 },
+    { wch: 16 },
+    { wch: 14 },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet, "Data KK");
+  const today = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(workbook, `Data-KK-Mojo-${today}.xlsx`);
 }
 
 function IconEdit() {
@@ -244,14 +309,25 @@ export function KkTable({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModalState({ mode: "add" })}
-          className="flex flex-shrink-0 items-center gap-1.5 rounded-[10px] bg-brand-green px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_12px_rgba(0,70,23,0.25)] transition-colors hover:bg-brand-green-hover"
-        >
-          <IconPlus />
-          Tambah KK
-        </button>
+        <div className="flex flex-shrink-0 items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => exportToExcel(filtered)}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-1.5 rounded-[10px] border-[1.5px] border-brand-border px-4 py-2.5 text-sm font-bold text-brand-ink transition-colors hover:enabled:border-brand-green hover:enabled:bg-brand-bg-alt disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IconDownload />
+            Export Excel
+          </button>
+          <button
+            type="button"
+            onClick={() => setModalState({ mode: "add" })}
+            className="flex items-center gap-1.5 rounded-[10px] bg-brand-green px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_12px_rgba(0,70,23,0.25)] transition-colors hover:bg-brand-green-hover"
+          >
+            <IconPlus />
+            Tambah KK
+          </button>
+        </div>
       </div>
 
       <div className="mb-5 flex flex-wrap gap-3">
