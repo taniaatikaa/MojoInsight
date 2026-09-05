@@ -6,10 +6,13 @@ export function SiteHeader({ active }: { active?: "struktur" }) {
     <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-white/92 backdrop-blur-md">
       <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="MojoInsight" width={28} height={28} priority />
-          <span className="text-xl leading-none font-extrabold tracking-tight text-brand-green">
-            Mojo<span className="font-medium text-brand-lime">Insight</span>
-          </span>
+          <Image
+            src="/logo.svg"
+            alt="MojoInsight"
+            width={100}
+            height={80}
+            priority
+          />
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-4">
