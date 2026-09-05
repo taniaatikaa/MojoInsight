@@ -21,7 +21,7 @@ export function AgeDistributionChart({ data }: { data: AgeBracketRow[] }) {
   const total = slices.reduce((sum, s) => sum + s.jumlah, 0);
 
   return (
-    <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
+    <div className="flex flex-col items-center gap-6 xl:flex-row xl:gap-8">
       <div className="relative h-[200px] w-[200px] flex-shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
