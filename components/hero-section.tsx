@@ -31,7 +31,7 @@ function StatCards({ stats }: { stats: HeroStats }) {
       value: stats.total_jiwa,
       color: "var(--color-brand-blue)",
       icon: (
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" />
       ),
     },
     {
@@ -49,7 +49,12 @@ function StatCards({ stats }: { stats: HeroStats }) {
       value: stats.kematian_tahun_berjalan,
       color: "var(--color-brand-gold)",
       icon: (
-        <path d="M12 2a8 8 0 0 0-8 8c0 3 1.5 5.5 4 7v3h8v-3c2.5-1.5 4-4 4-7a8 8 0 0 0-8-8Z M12 18v3 M9 20h6" />
+        <g transform="translate(12 12) scale(0.8) translate(-12 -12)">
+          <path
+            d="M12 2a8 8 0 0 0-8 8c0 3 1.5 5.5 4 7v3h8v-3c2.5-1.5 4-4 4-7a8 8 0 0 0-8-8Z M12 18v3 M9 20h6"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
       ),
     },
   ];
