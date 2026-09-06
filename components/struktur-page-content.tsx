@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { KAWUNG_TILE } from "@/lib/kawung-tile";
+import { jabatanRank } from "@/lib/jabatan-list";
 import { StrukturKepalaCard } from "./struktur-kepala-card";
 import { StrukturRtCard } from "./struktur-rt-card";
 
@@ -8,7 +9,6 @@ export type PengurusRow = {
   nama: string;
   jabatan: string;
   fotoUrl: string | null;
-  urutan: number | null;
 };
 
 function EmptyNote({ text }: { text: string }) {
@@ -20,10 +20,11 @@ function EmptyNote({ text }: { text: string }) {
 }
 
 export function StrukturPageContent({ pengurus }: { pengurus: PengurusRow[] }) {
-  const kepalaDukuh = pengurus.find((p) => p.jabatan.toLowerCase().includes("kepala dukuh")) ?? null;
-  const ketuaRt = pengurus
-    .filter((p) => p !== kepalaDukuh)
-    .sort((a, b) => (a.urutan ?? 999) - (b.urutan ?? 999));
+  const kepalaDukuh = pengurus.find((p) => jabatanRank(p.jabatan) === 0) ?? null;
+  const ketuaRw = pengurus.find((p) => jabatanRank(p.jabatan) === 1) ?? null;
+  const featured = [kepalaDukuh, ketuaRw].filter((p): p is PengurusRow => p !== null);
+  const featuredIds = new Set(featured.map((p) => p.id));
+  const ketuaRt = pengurus.filter((p) => !featuredIds.has(p.id));
 
   return (
     <>
@@ -54,8 +55,8 @@ export function StrukturPageContent({ pengurus }: { pengurus: PengurusRow[] }) {
           </h1>
 
           <p className="mb-5 max-w-[520px] text-[clamp(13px,1.4vw,16px)] leading-relaxed text-white/60">
-            Susunan Kepala Dukuh dan Ketua RT di lingkungan RW 13, Dusun Mojo, Desa Ngeposari,
-            Kecamatan Semanu, Kabupaten Gunung Kidul.
+            Susunan Kepala Dukuh, Ketua RW, dan Ketua RT di lingkungan RW 13, Dusun Mojo, Desa
+            Ngeposari, Kecamatan Semanu, Kabupaten Gunung Kidul.
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -81,11 +82,17 @@ export function StrukturPageContent({ pengurus }: { pengurus: PengurusRow[] }) {
             <div className="h-px w-12 bg-brand-border" />
           </div>
 
-          {kepalaDukuh ? (
-            <StrukturKepalaCard pengurus={kepalaDukuh} />
+          {featured.length > 0 ? (
+            <div
+              className={`mx-auto grid gap-6 ${featured.length === 2 ? "max-w-[1160px] sm:grid-cols-2" : "max-w-[560px]"}`}
+            >
+              {featured.map((p) => (
+                <StrukturKepalaCard key={p.id} pengurus={p} />
+              ))}
+            </div>
           ) : (
             <div className="mx-auto max-w-[560px]">
-              <EmptyNote text="Data Kepala Dukuh belum diisi." />
+              <EmptyNote text="Data Kepala Dukuh & Ketua RW belum diisi." />
             </div>
           )}
         </section>

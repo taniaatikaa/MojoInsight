@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { StrukturPageContent, type PengurusRow } from "@/components/struktur-page-content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { sortByJabatanHierarchy } from "@/lib/jabatan-list";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -11,16 +12,16 @@ export const metadata: Metadata = {
 export default async function StrukturPage() {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("pengurus")
-    .select("id, nama, jabatan, foto_path, urutan")
-    .order("urutan", { ascending: true, nullsFirst: false });
+  const { data } = await supabase.from("pengurus").select("id, nama, jabatan, foto_path, created_at");
 
-  const pengurus: PengurusRow[] = (data ?? []).map((row) => ({
+  const sorted = sortByJabatanHierarchy(
+    (data ?? []).map((row) => ({ ...row, createdAt: row.created_at as string })),
+  );
+
+  const pengurus: PengurusRow[] = sorted.map((row) => ({
     id: row.id,
     nama: row.nama,
     jabatan: row.jabatan,
-    urutan: row.urutan,
     fotoUrl: row.foto_path
       ? supabase.storage.from("pengurus-photos").getPublicUrl(row.foto_path).data.publicUrl
       : null,

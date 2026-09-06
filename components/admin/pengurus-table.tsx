@@ -10,7 +10,6 @@ export type PengurusAdminRow = {
   id: string;
   nama: string;
   jabatan: string;
-  urutan: number | null;
   fotoUrl: string | null;
 };
 
@@ -104,7 +103,7 @@ export function PengurusTable({ rows }: { rows: PengurusAdminRow[] }) {
           <h1 className="mb-1 text-xl font-extrabold tracking-tight text-brand-ink sm:text-2xl">
             Struktur Pengurus
           </h1>
-          <p className="text-[13px] text-brand-muted">Kelola profil Kepala Dukuh dan Ketua RT 1-6.</p>
+          <p className="text-[13px] text-brand-muted">Kelola profil Kepala Dukuh, Ketua RW, dan Ketua RT 1-6.</p>
         </div>
 
         <button
@@ -135,7 +134,6 @@ export function PengurusTable({ rows }: { rows: PengurusAdminRow[] }) {
                     <th className="w-16 px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">Foto</th>
                     <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">Nama</th>
                     <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">Jabatan</th>
-                    <th className="w-20 px-4 py-3 text-center text-[11px] font-bold tracking-wider text-brand-muted uppercase">Urutan</th>
                     <th className="w-28 px-4 py-3 text-center text-[11px] font-bold tracking-wider text-brand-muted uppercase">Aksi</th>
                   </tr>
                 </thead>
@@ -147,9 +145,6 @@ export function PengurusTable({ rows }: { rows: PengurusAdminRow[] }) {
                       </td>
                       <td className="px-4 py-3.5 text-sm font-semibold text-brand-ink">{row.nama}</td>
                       <td className="px-4 py-3.5 text-sm text-brand-muted">{row.jabatan}</td>
-                      <td className="px-4 py-3.5 text-center text-sm text-brand-muted tabular-nums">
-                        {row.urutan ?? "—"}
-                      </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center justify-center gap-1.5">
                           <button

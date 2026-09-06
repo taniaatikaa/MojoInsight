@@ -41,7 +41,6 @@ export function PengurusFormModal({
 }) {
   const [nama, setNama] = useState(initial?.nama ?? "");
   const [jabatan, setJabatan] = useState(initial?.jabatan ?? "");
-  const [urutan, setUrutan] = useState(initial?.urutan != null ? String(initial.urutan) : "");
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [removeFoto, setRemoveFoto] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -94,7 +93,6 @@ export function PengurusFormModal({
     if (initial?.id) formData.set("id", initial.id);
     formData.set("nama", nama.trim());
     formData.set("jabatan", jabatan.trim());
-    formData.set("urutan", urutan.trim());
     formData.set("removeFoto", String(removeFoto));
     if (fotoFile) formData.set("foto", fotoFile);
 
@@ -197,17 +195,6 @@ export function PengurusFormModal({
                 options={JABATAN_OPTIONS}
                 placeholder="Cari atau ketik jabatan..."
                 ariaLabel="Jabatan"
-              />
-            </FormField>
-
-            <FormField label="Urutan Tampil">
-              <input
-                type="number"
-                min={0}
-                value={urutan}
-                onChange={(e) => setUrutan(e.target.value)}
-                placeholder="cth. 1 (kosongkan untuk tampil di akhir)"
-                className="w-full rounded-[10px] border-[1.5px] border-brand-border px-3 py-2.5 text-sm text-brand-ink outline-none transition-colors focus:border-brand-green"
               />
             </FormField>
           </div>

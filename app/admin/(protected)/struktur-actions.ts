@@ -13,20 +13,11 @@ export async function savePengurus(formData: FormData): Promise<SavePengurusResu
   const pengurusId = typeof id === "string" && id ? id : undefined;
   const nama = String(formData.get("nama") ?? "").trim();
   const jabatan = String(formData.get("jabatan") ?? "").trim();
-  const urutanRaw = String(formData.get("urutan") ?? "").trim();
   const removeFoto = formData.get("removeFoto") === "true";
   const foto = formData.get("foto");
 
   if (!nama || !jabatan) {
     return { ok: false, message: "Nama dan Jabatan wajib diisi." };
-  }
-
-  let urutan: number | null = null;
-  if (urutanRaw) {
-    urutan = Number(urutanRaw);
-    if (!Number.isFinite(urutan) || urutan < 0) {
-      return { ok: false, message: "Urutan harus berupa angka." };
-    }
   }
 
   const supabase = await createClient();
@@ -61,7 +52,7 @@ export async function savePengurus(formData: FormData): Promise<SavePengurusResu
     fotoPath = null;
   }
 
-  const payload = { nama, jabatan, urutan, foto_path: fotoPath };
+  const payload = { nama, jabatan, foto_path: fotoPath };
   const { error } = pengurusId
     ? await supabase.from("pengurus").update(payload).eq("id", pengurusId)
     : await supabase.from("pengurus").insert(payload);
