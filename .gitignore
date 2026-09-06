@@ -41,13 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# raw population data (real names/birthdates) — never commit, even though DOCS/ is tracked
-/DOCS/KK-Excel/
-/DOCS/KK-Data-Preview.md
-
-# raw working materials — reference only, rebuilt as real Next.js components per milestone.
-# Figma Make's own export scaffold (AGENTS.md, CLAUDE.md, .figma/, package.json naming
-# "figma-make-app", etc.) must never be committed. Only the plain .tsx/.css source and the
-# logo assets are force-added (`git add -f`) as the actual design reference — everything
-# else in here stays local-only.
+# local-only working materials — project notes, planning docs, raw population
+# data (real names/birthdates), and design references. Never committed.
+/CLAUDE.md
+/DOCS/
 /NEEDS/
