@@ -6,23 +6,26 @@ import { usePathname } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin-logout-button";
 import { KAWUNG_TILE } from "@/lib/kawung-tile";
 
-type NavKey = "kk" | "mutasi" | "struktur";
+type NavKey = "kk" | "mutasi" | "struktur" | "settings";
 
 const NAV_ITEMS: { key: NavKey; href: string; label: string }[] = [
   { key: "kk", href: "/admin", label: "Data KK" },
   { key: "mutasi", href: "/admin/mutasi", label: "Log Mutasi" },
   { key: "struktur", href: "/admin/struktur", label: "Struktur Pengurus" },
+  { key: "settings", href: "/admin/settings", label: "Pengaturan Akun" },
 ];
 
 const PAGE_TITLES: Record<NavKey, string> = {
   kk: "Data Kartu Keluarga",
   mutasi: "Log Mutasi",
   struktur: "Struktur Pengurus",
+  settings: "Pengaturan Akun",
 };
 
 function navKeyFromPath(pathname: string): NavKey {
   if (pathname.startsWith("/admin/mutasi")) return "mutasi";
   if (pathname.startsWith("/admin/struktur")) return "struktur";
+  if (pathname.startsWith("/admin/settings")) return "settings";
   return "kk";
 }
 
@@ -60,6 +63,14 @@ function NavIcon({ navKey }: { navKey: NavKey }) {
       <svg {...common}>
         <circle cx="12" cy="12" r="9" />
         <polyline points="12 7 12 12 15.5 15.5" />
+      </svg>
+    );
+  }
+  if (navKey === "settings") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
     );
   }
