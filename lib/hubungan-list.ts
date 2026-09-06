@@ -3,9 +3,7 @@
 export const HUBUNGAN_OPTIONS: string[] = [
   "Kepala Keluarga",
   "Istri",
-  "Suami",
   "Anak",
-  "Menantu",
   "Cucu",
   "Orang Tua",
   "Mertua",
