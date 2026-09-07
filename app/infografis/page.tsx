@@ -45,6 +45,43 @@ function StatIcon({ path, color }: { path: React.ReactNode; color: string }) {
   );
 }
 
+function StaticRtMap({ rtList }: { rtList: RtSummaryRow[] }) {
+  if (rtList.length === 0) return null;
+
+  const lats = rtList.map((rt) => rt.latitude);
+  const lons = rtList.map((rt) => rt.longitude);
+  const latMin = Math.min(...lats);
+  const latMax = Math.max(...lats);
+  const lonMin = Math.min(...lons);
+  const lonMax = Math.max(...lons);
+  const latSpan = latMax - latMin || 1;
+  const lonSpan = lonMax - lonMin || 1;
+  const pad = 16;
+
+  return (
+    <div className="relative h-[150px] w-full overflow-hidden rounded-lg bg-brand-bg-alt">
+      {rtList.map((rt) => {
+        const xPct = pad + ((rt.longitude - lonMin) / lonSpan) * (100 - pad * 2);
+        const yPct = pad + ((latMax - rt.latitude) / latSpan) * (100 - pad * 2);
+        return (
+          <div
+            key={rt.rt_id}
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
+            style={{ left: `${xPct}%`, top: `${yPct}%` }}
+          >
+            <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-brand-green text-[10px] font-extrabold text-white">
+              {rt.rt_id}
+            </div>
+            <span className="rounded bg-white/90 px-1 text-[8px] font-bold whitespace-nowrap text-brand-ink">
+              {rt.jumlah_jiwa.toLocaleString("id-ID")} jiwa
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function DonutChart({ slices, total }: { slices: { color: string; jumlah: number }[]; total: number }) {
   const cumulative = slices.reduce<number[]>((acc, s) => {
     const prev = acc.length > 0 ? acc[acc.length - 1] : 0;
@@ -235,6 +272,12 @@ export default async function InfografisPage() {
                 Angka menunjukkan jumlah jiwa pada tiap jenis pekerjaan.
               </p>
             </div>
+          </div>
+
+          <div className="mb-4 rounded-xl border border-brand-border p-4">
+            <p className="text-[13px] font-extrabold text-brand-green">Peta Wilayah</p>
+            <p className="mb-3 text-[11px] text-brand-muted">Sebaran lokasi {rtList.length} RT (skala ilustratif)</p>
+            <StaticRtMap rtList={rtList} />
           </div>
 
           <div>
