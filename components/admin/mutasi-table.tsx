@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { JenisMutasi } from "@/lib/jenis-mutasi-list";
+import { deleteMutasi } from "@/app/admin/(protected)/mutasi-actions";
 import { MutasiFormModal } from "./mutasi-form-modal";
 
 export type MutasiRow = {
@@ -116,6 +117,17 @@ function IconPlus() {
   );
 }
 
+function IconTrash() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  );
+}
+
 function EmptyState({ message, hint }: { message: string; hint: string }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
@@ -218,10 +230,33 @@ export function MutasiTable({
   const [rtFilter, setRtFilter] = useState(lockedRtId ?? 0);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   function handleSaved() {
     setShowModal(false);
     router.refresh();
+  }
+
+  function handleDelete(row: MutasiRow) {
+    if (
+      !confirm(
+        `Hapus catatan mutasi "${row.jenisMutasi}" untuk ${row.namaAnggota}? Status kependudukan akan dihitung ulang dari sisa riwayat. Tindakan ini tidak bisa dibatalkan.`,
+      )
+    )
+      return;
+    setErrorMessage("");
+    setDeletingId(row.id);
+    startTransition(async () => {
+      const result = await deleteMutasi(row.id);
+      setDeletingId(null);
+      if (!result.ok) {
+        setErrorMessage(result.message);
+        return;
+      }
+      router.refresh();
+    });
   }
 
   const filterKey = `${search}|${rtFilter}`;
@@ -345,6 +380,7 @@ export function MutasiTable({
                     <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">RT</th>
                     <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">Jenis Mutasi</th>
                     <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-brand-muted uppercase">Keterangan</th>
+                    <th className="w-16 px-4 py-3 text-center text-[11px] font-bold tracking-wider text-brand-muted uppercase">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -369,6 +405,17 @@ export function MutasiTable({
                         <JenisBadge jenis={row.jenisMutasi} />
                       </td>
                       <td className="px-4 py-3.5 text-[13px] text-brand-muted">{row.keterangan || "—"}</td>
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(row)}
+                          disabled={isPending && deletingId === row.id}
+                          aria-label={`Hapus catatan mutasi ${row.namaAnggota}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#8A2A2A] transition-colors hover:bg-[#F3D9D9] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <IconTrash />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -385,7 +432,18 @@ export function MutasiTable({
                       </p>
                       <p className="text-[15px] leading-tight font-bold text-brand-ink">{row.namaAnggota}</p>
                     </div>
-                    <RtBadge rtId={row.rtId} />
+                    <div className="flex items-center gap-1.5">
+                      <RtBadge rtId={row.rtId} />
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(row)}
+                        disabled={isPending && deletingId === row.id}
+                        aria-label={`Hapus catatan mutasi ${row.namaAnggota}`}
+                        className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[#8A2A2A] transition-colors hover:bg-[#F3D9D9] disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <IconTrash />
+                      </button>
+                    </div>
                   </div>
                   <div className="mb-2 flex items-center gap-2">
                     <JenisBadge jenis={row.jenisMutasi} />
@@ -402,6 +460,12 @@ export function MutasiTable({
           </>
         )}
       </div>
+
+      {errorMessage && (
+        <p className="mt-3 rounded-[10px] bg-[#F3D9D9] px-3.5 py-2.5 text-[13px] font-medium text-[#8A2A2A]">
+          {errorMessage}
+        </p>
+      )}
 
       {!isEmpty && <Pagination current={page} totalItems={filtered.length} onChange={setCurrentPage} />}
 

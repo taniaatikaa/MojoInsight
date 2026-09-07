@@ -37,3 +37,15 @@ export async function catatMutasi(input: CatatMutasiInput): Promise<CatatMutasiR
   revalidatePath("/");
   return { ok: true };
 }
+
+export async function deleteMutasi(id: string): Promise<CatatMutasiResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("mutasi_log").delete().eq("id", id);
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/admin/mutasi");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { ok: true };
+}
