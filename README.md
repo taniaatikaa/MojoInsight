@@ -4,14 +4,15 @@
 
 # MojoInsight
 
-Sistem informasi kependudukan untuk **6 RT di RW 13, Dusun Mojo**, Desa
-Ngeposari, Kecamatan Semanu, Gunung Kidul. Menggantikan pencatatan manual
-(fotokopi Kartu Keluarga) dengan dashboard admin ber-CRUD dan visualisasi
-publik yang selalu sinkron dengan data terkini.
+Sistem informasi kependudukan untuk 6 RT di RW 13, Dusun Mojo, Desa
+Ngeposari, Kecamatan Semanu, Gunung Kidul. Dibangun sebagai program kerja
+individu KKN, menggantikan pencatatan manual (fotokopi Kartu Keluarga) yang
+selama ini dipakai dengan dashboard admin dan visualisasi data publik yang
+selalu sinkron dengan kondisi terkini.
 
-**Live:** [mojo-insight.vercel.app](https://mojo-insight.vercel.app/)
+**Live:** [mojoinsight.tech](https://www.mojoinsight.tech/)
 
-Cakupan data saat ini: **279 keluarga**, **±800 jiwa**, 6 RT.
+Cakupan data saat ini: 279 keluarga, sekitar 800 jiwa, 6 RT.
 
 ## Tech Stack
 
@@ -24,38 +25,44 @@ Cakupan data saat ini: **279 keluarga**, **±800 jiwa**, 6 RT.
 ![Recharts](https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-Satu aplikasi Next.js (App Router). Data di Supabase (PostgreSQL); halaman
-publik hanya membaca *view* agregat, panel admin menulis lewat Server
-Actions ke tabel yang dijaga Row Level Security.
+Satu aplikasi Next.js (App Router). Data disimpan di Supabase (PostgreSQL).
+Halaman publik hanya membaca view agregat, sedangkan panel admin menulis
+lewat Server Actions ke tabel yang dijaga Row Level Security. Halaman
+publik tidak pernah menyentuh tabel mentah secara langsung, jadi nama dan
+tanggal lahir warga tidak pernah terekspos di sisi publik.
 
 ## Fitur
 
-- **Landing publik** — *live counter* (total KK, total jiwa, kelahiran &
+- Landing publik dengan live counter (total KK, total jiwa, kelahiran dan
   kematian tahun berjalan), grafik distribusi kelompok usia (donut) dan
-  Top 3 Pekerjaan (bar), serta peta 6 RT (Leaflet + tile OSM, koordinat
-  GPS asli) dengan panel detail per RT.
-- **Halaman Struktur Pengurus** (`/struktur`) — kartu Kepala Dukuh & Ketua
-  RW, grid Ketua RT 01–06, foto dari Supabase Storage dengan fallback
+  Top 3 Pekerjaan (bar), serta peta 6 RT (Leaflet dengan tile OSM,
+  koordinat GPS asli) lengkap dengan panel detail per RT.
+- Halaman Struktur Pengurus (`/struktur`): kartu Kepala Dukuh dan Ketua
+  RW, grid Ketua RT 01-06, foto dari Supabase Storage dengan fallback
   avatar inisial. Urutan tampil otomatis mengikuti hierarki jabatan.
-- **Tabel Data KK** (admin) — pencarian nama/No. KK, filter per RT,
-  paginasi, dan ekspor `.xlsx` mengikuti filter yang sedang aktif.
-- **Modal Form KK** — satu modal *nested*: No. KK + RT diisi sekali, lalu
-  tambah/hapus anggota keluarga berkali-kali, submit sekali. Dropdown
-  Pekerjaan pakai *search/autocomplete*; peringatan duplikat nama +
-  tanggal lahir muncul *live* saat mengetik (lintas RT, non-blocking).
-- **Log Mutasi** — pencatatan *append-only* kejadian Lahir / Meninggal /
-  Pindah Masuk / Pindah Keluar. `status_kependudukan` anggota ikut
-  ter-*update* otomatis lewat trigger, dan counter kelahiran/kematian di
+- Tabel Data KK di admin: pencarian nama/No. KK, filter per RT, paginasi,
+  dan ekspor ke `.xlsx` mengikuti filter yang sedang aktif.
+- Modal Form KK berbentuk nested: No. KK dan RT diisi sekali, lalu
+  anggota keluarga bisa ditambah/dihapus berkali-kali sebelum submit.
+  Dropdown Pekerjaan pakai search/autocomplete, dan ada peringatan
+  duplikat nama plus tanggal lahir yang muncul langsung saat mengetik
+  (lintas RT, sifatnya non-blocking).
+- Log Mutasi: pencatatan append-only untuk kejadian Lahir, Meninggal,
+  Pindah Masuk, dan Pindah Keluar. Status kependudukan anggota ikut
+  ter-update otomatis lewat trigger, dan counter kelahiran/kematian di
   hero dihitung dari log ini.
-- **CRUD Struktur Pengurus** — kelola profil pengurus + unggah/hapus foto.
-- **Auth admin** — Supabase Auth (email/password; Google OAuth *wired*,
-  tinggal aktifkan provider), *whitelist* email lewat tabel `admin_users`,
-  `middleware` melindungi `/admin/*`, dan halaman ganti kata sandi sendiri.
-- **Peran 2 tingkat** — `super_admin` (semua RT) dan `rt_admin` (CRUD penuh
-  tapi terkunci ke RT-nya sendiri). Ditegakkan lewat RLS, bukan sekadar
-  filter UI, sehingga tidak bisa di-*bypass* lewat API langsung.
-- **Sinkronisasi** — `revalidatePath` setelah tiap mutasi admin; halaman
-  publik langsung ikut ter-*update* tanpa deploy ulang.
+- CRUD Struktur Pengurus untuk mengelola profil pengurus beserta upload
+  dan hapus foto.
+- Auth admin pakai Supabase Auth (email/password; Google OAuth sudah
+  disiapkan di kode, tinggal aktifkan provider-nya), whitelist email
+  lewat tabel `admin_users`, middleware yang melindungi `/admin/*`, dan
+  halaman untuk ganti kata sandi sendiri.
+- Dua tingkat peran: `super_admin` (akses semua RT) dan `rt_admin` (CRUD
+  penuh tapi terkunci ke RT-nya sendiri). Ditegakkan lewat RLS, bukan
+  sekadar filter di UI, jadi tidak bisa dilewati lewat panggilan API
+  langsung.
+- Sinkronisasi otomatis lewat `revalidatePath` setelah tiap mutasi admin,
+  jadi halaman publik langsung ikut terbarui tanpa perlu deploy ulang.
 
 ## Struktur Proyek
 
@@ -88,13 +95,13 @@ mojoinsight/
 cp .env.example .env.local
 ```
 
-Isi dari Supabase dashboard → Project Settings → API:
+Isi dari Supabase dashboard, menu Project Settings > API:
 
 | Variable | Keterangan |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL project Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key (aman di browser) |
-| `SUPABASE_SERVICE_ROLE_KEY` | server-only, bypass RLS — dipakai skrip migrasi data saja, jangan pernah ter-*bundle* ke browser |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key, aman dipakai di browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | server-only, bypass RLS, dipakai skrip migrasi data saja, jangan pernah ikut ter-bundle ke browser |
 
 ### 2. Dependency & dev server
 
@@ -113,38 +120,22 @@ supabase link --project-ref <project-ref>
 supabase db push
 ```
 
-## Model Data
-
-| Entitas | Field |
-| --- | --- |
-| `rt` | id (1–6), nama, latitude, longitude |
-| `keluarga` | id, no_kk *(sengaja tidak unik — kasus "KK Tempel")*, rt_id |
-| `anggota_keluarga` | id, keluarga_id, nama, status_hubungan, jenis_kelamin, tanggal_lahir, pekerjaan, status_kependudukan |
-| `mutasi_log` | id, anggota_id, jenis_mutasi, tanggal_kejadian, keterangan, created_by *(append-only)* |
-| `pengurus` | id, nama, jabatan, foto_path |
-| `admin_users` | email, role (`super_admin` / `rt_admin`), rt_id — *whitelist* login |
-
-Halaman publik tidak pernah menyentuh tabel di atas secara langsung. Semua
-angka di landing page dibaca dari *view* agregat (`v_hero_stats`,
-`v_age_bracket_distribution`, `v_pekerjaan_distribution`, `v_rt_summary`,
-dan turunannya) yang tidak mengekspos nama maupun tanggal lahir.
-
 ## Batas Kelompok Usia
 
 | Kelompok | Rentang |
 | --- | --- |
-| Usia Belajar | 0–14 |
-| Usia Produktif | 15–59 |
+| Usia Belajar | 0-14 |
+| Usia Produktif | 15-59 |
 | Lansia | 60+ |
 
-Mengikuti UU No. 13 Tahun 1998 (bukan *cutoff* 65 ala BPS) agar selaras
-dengan program riil di lapangan seperti Posyandu Lansia.
+Mengikuti UU No. 13 Tahun 1998, bukan cutoff 65 tahun ala BPS, supaya
+selaras dengan program riil di lapangan seperti Posyandu Lansia.
 
 ## Tim
 
-Program Kerja Individu KKN — Dusun Mojo.
+Program kerja individu KKN Tania di Dusun Mojo.
 
 | Orang | Bagian |
 | --- | --- |
-| Hidayat | Arsitektur sistem, engineering, integrasi |
-| Tania | Data entry, setup infrastruktur (Supabase & Vercel), fitur |
+| Tania | Pemilik program, data entry, setup infrastruktur (Supabase & Vercel), pengembangan fitur |
+| Hidayat | Bantu coding/development |
