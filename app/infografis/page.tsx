@@ -158,7 +158,7 @@ export default async function InfografisPage() {
     <div className="min-h-screen bg-[#e8ece3] py-10 print:min-h-0 print:bg-white print:py-0">
       <PrintTrigger />
 
-      <div className="mx-auto w-[210mm] overflow-hidden rounded-2xl bg-white text-brand-ink shadow-xl print:w-full print:rounded-none print:shadow-none">
+      <div className="mx-auto flex w-[210mm] flex-col overflow-hidden rounded-2xl bg-white text-brand-ink shadow-xl print:w-full print:min-h-[273mm] print:rounded-none print:shadow-none">
         <div
           className="relative overflow-hidden bg-brand-green bg-[length:56px_56px] px-9 pt-6 pb-4"
           style={{ backgroundImage: `url("${KAWUNG_TILE}")` }}
@@ -337,7 +337,7 @@ export default async function InfografisPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between bg-brand-green px-9 py-3">
+        <div className="mt-auto flex items-center justify-between bg-brand-green px-9 py-3">
           <p className="text-[10px] text-white/60">
             Dicetak otomatis dari mojoinsight.tech · Data bersumber dari administrasi Dusun Mojo
           </p>
