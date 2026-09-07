@@ -1,9 +1,11 @@
+import Image from "next/image";
 import type { AgeBracketRow } from "@/components/age-distribution-chart";
 import type { HeroStats } from "@/components/hero-section";
 import type { PekerjaanRow } from "@/components/occupation-chart";
 import type { RtSummaryRow } from "@/components/village-map-section";
 import { PrintTrigger } from "@/components/print-trigger";
 import { KAWUNG_TILE } from "@/lib/kawung-tile";
+import { computeRtMapBounds, rtPercentPosition } from "@/lib/rt-map-projection";
 import { createClient } from "@/lib/supabase/server";
 
 const BRACKET_META: Record<string, { label: string; sub: string; color: string }> = {
@@ -45,39 +47,56 @@ function StatIcon({ path, color }: { path: React.ReactNode; color: string }) {
   );
 }
 
+const RT_MAP_WIDTH = 686;
+const RT_MAP_HEIGHT = 476;
+const RT_MAP_DISPLAY_HEIGHT = 150;
+
 function StaticRtMap({ rtList }: { rtList: RtSummaryRow[] }) {
   if (rtList.length === 0) return null;
 
-  const lats = rtList.map((rt) => rt.latitude);
-  const lons = rtList.map((rt) => rt.longitude);
-  const latMin = Math.min(...lats);
-  const latMax = Math.max(...lats);
-  const lonMin = Math.min(...lons);
-  const lonMax = Math.max(...lons);
-  const latSpan = latMax - latMin || 1;
-  const lonSpan = lonMax - lonMin || 1;
-  const pad = 16;
+  const bounds = computeRtMapBounds(rtList);
 
   return (
-    <div className="relative h-[150px] w-full overflow-hidden rounded-lg bg-brand-bg-alt">
-      {rtList.map((rt) => {
-        const xPct = pad + ((rt.longitude - lonMin) / lonSpan) * (100 - pad * 2);
-        const yPct = pad + ((latMax - rt.latitude) / latSpan) * (100 - pad * 2);
-        return (
-          <div
-            key={rt.rt_id}
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
-            style={{ left: `${xPct}%`, top: `${yPct}%` }}
-          >
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-brand-green text-[10px] font-extrabold text-white">
+    <div className="flex items-start gap-4">
+      <div
+        className="relative flex-shrink-0 overflow-hidden rounded-lg"
+        style={{ height: RT_MAP_DISPLAY_HEIGHT, aspectRatio: `${RT_MAP_WIDTH} / ${RT_MAP_HEIGHT}` }}
+      >
+        <Image
+          src="/rt-wilayah-map.png"
+          alt="Peta jalan wilayah RW 13"
+          fill
+          className="object-cover"
+          priority
+        />
+        {rtList.map((rt) => {
+          const { xPct, yPct } = rtPercentPosition(rt, bounds);
+          return (
+            <div
+              key={rt.rt_id}
+              className="absolute flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-brand-green text-[9px] font-extrabold text-white shadow"
+              style={{ left: `${xPct}%`, top: `${yPct}%` }}
+            >
               {rt.rt_id}
             </div>
-            <span className="rounded bg-white/90 px-1 text-[8px] font-bold whitespace-nowrap text-brand-ink">
-              {rt.jumlah_jiwa.toLocaleString("id-ID")} jiwa
+          );
+        })}
+        <span className="absolute right-1 bottom-0.5 rounded bg-white/80 px-1 text-[6px] text-brand-muted">
+          © OpenStreetMap
+        </span>
+      </div>
+
+      <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1.5 self-center">
+        {rtList.map((rt) => (
+          <div key={rt.rt_id} className="flex items-center gap-1.5">
+            <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-brand-green text-[8px] font-extrabold text-white">
+              {rt.rt_id}
             </span>
+            <span className="text-[11px] font-semibold text-brand-ink">RT {rt.rt_id.toString().padStart(2, "0")}</span>
+            <span className="text-[11px] text-brand-muted">· {rt.jumlah_jiwa.toLocaleString("id-ID")} jiwa</span>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }
