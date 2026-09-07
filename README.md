@@ -4,15 +4,15 @@
 
 # MojoInsight
 
-Sistem informasi kependudukan untuk 6 RT di RW 13, Dusun Mojo, Desa
-Ngeposari, Kecamatan Semanu, Gunung Kidul. Dibangun sebagai program kerja
-individu KKN, menggantikan pencatatan manual (fotokopi Kartu Keluarga) yang
-selama ini dipakai dengan dashboard admin dan visualisasi data publik yang
-selalu sinkron dengan kondisi terkini.
+A population data system for 6 RT (neighborhood units) in RW 13, Dusun Mojo,
+Ngeposari Village, Semanu District, Gunung Kidul. Built as an individual KKN
+(university community service) project, replacing manual record-keeping
+(photocopies of Family Cards) with an admin dashboard and a public data
+visualization that always stays in sync with the current state.
 
 **Live:** [mojoinsight.tech](https://www.mojoinsight.tech/)
 
-Cakupan data saat ini: 279 keluarga, sekitar 800 jiwa, 6 RT.
+Current data coverage: 279 families, around 800 residents, 6 RT.
 
 ## Tech Stack
 
@@ -25,85 +25,85 @@ Cakupan data saat ini: 279 keluarga, sekitar 800 jiwa, 6 RT.
 ![Recharts](https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-Satu aplikasi Next.js (App Router). Data disimpan di Supabase (PostgreSQL).
-Halaman publik hanya membaca view agregat, sedangkan panel admin menulis
-lewat Server Actions ke tabel yang dijaga Row Level Security. Halaman
-publik tidak pernah menyentuh tabel mentah secara langsung, jadi nama dan
-tanggal lahir warga tidak pernah terekspos di sisi publik.
+A single Next.js app (App Router). Data is stored in Supabase (PostgreSQL).
+The public site only reads from aggregate views, while the admin panel
+writes through Server Actions to tables protected by Row Level Security.
+The public site never touches the raw tables directly, so residents' names
+and birthdates are never exposed on the public side.
 
-## Fitur
+## Features
 
-- Landing publik dengan live counter (total KK, total jiwa, kelahiran dan
-  kematian tahun berjalan), grafik distribusi kelompok usia (donut) dan
-  Top 3 Pekerjaan (bar), serta peta 6 RT (Leaflet dengan tile OSM,
-  koordinat GPS asli) lengkap dengan panel detail per RT.
-- Halaman Struktur Pengurus (`/struktur`): kartu Kepala Dukuh dan Ketua
-  RW, grid Ketua RT 01-06, foto dari Supabase Storage dengan fallback
-  avatar inisial. Urutan tampil otomatis mengikuti hierarki jabatan.
-- Tabel Data KK di admin: pencarian nama/No. KK, filter per RT, paginasi,
-  dan ekspor ke `.xlsx` mengikuti filter yang sedang aktif.
-- Modal Form KK berbentuk nested: No. KK dan RT diisi sekali, lalu
-  anggota keluarga bisa ditambah/dihapus berkali-kali sebelum submit.
-  Dropdown Pekerjaan pakai search/autocomplete, dan ada peringatan
-  duplikat nama plus tanggal lahir yang muncul langsung saat mengetik
-  (lintas RT, sifatnya non-blocking).
-- Log Mutasi: pencatatan append-only untuk kejadian Lahir, Meninggal,
-  Pindah Masuk, dan Pindah Keluar. Status kependudukan anggota ikut
-  ter-update otomatis lewat trigger, dan counter kelahiran/kematian di
-  hero dihitung dari log ini.
-- CRUD Struktur Pengurus untuk mengelola profil pengurus beserta upload
-  dan hapus foto.
-- Auth admin pakai Supabase Auth (email/password; Google OAuth sudah
-  disiapkan di kode, tinggal aktifkan provider-nya), whitelist email
-  lewat tabel `admin_users`, middleware yang melindungi `/admin/*`, dan
-  halaman untuk ganti kata sandi sendiri.
-- Dua tingkat peran: `super_admin` (akses semua RT) dan `rt_admin` (CRUD
-  penuh tapi terkunci ke RT-nya sendiri). Ditegakkan lewat RLS, bukan
-  sekadar filter di UI, jadi tidak bisa dilewati lewat panggilan API
-  langsung.
-- Sinkronisasi otomatis lewat `revalidatePath` setelah tiap mutasi admin,
-  jadi halaman publik langsung ikut terbarui tanpa perlu deploy ulang.
+- Public landing page with a live counter (total families, total residents,
+  births and deaths for the current year), an age group distribution chart
+  (donut) and a Top 3 Occupations chart (bar), plus a map of all 6 RT
+  (Leaflet with OSM tiles, real GPS coordinates) with a detail panel per RT.
+- Community Leaders page (`/struktur`): cards for the Village Head and RW
+  Head, a grid of RT Heads 01-06, photos from Supabase Storage with an
+  initials avatar fallback. Display order follows the position hierarchy
+  automatically.
+- Family Data table in the admin panel: search by name/family card number,
+  filter by RT, pagination, and export to `.xlsx` following the currently
+  active filter.
+- A nested Family Data form: family card number and RT are filled in once,
+  then family members can be added or removed as many times as needed
+  before a single submit. The occupation dropdown has search/autocomplete,
+  and a duplicate name plus birthdate warning appears live while typing
+  (checked across all RT, non-blocking).
+- Mutation Log: append-only records for Birth, Death, Moved In, and Moved
+  Out events. A member's residency status updates automatically through a
+  trigger, and the birth/death counters on the landing page are computed
+  from this log.
+- CRUD for Community Leaders, including photo upload and removal.
+- Admin authentication via Supabase Auth (email/password; Google OAuth is
+  already wired in the code, just needs the provider enabled), an email
+  whitelist through the `admin_users` table, middleware protecting
+  `/admin/*`, and a page for changing your own password.
+- Two permission tiers: `super_admin` (access to all RT) and `rt_admin`
+  (full CRUD but locked to their own RT). Enforced through RLS, not just
+  UI filtering, so it can't be bypassed through a direct API call.
+- Automatic sync via `revalidatePath` after every admin mutation, so the
+  public pages reflect changes immediately without a redeploy.
 
-## Struktur Proyek
+## Project Structure
 
 ```
 mojoinsight/
 ├── app/
-│   ├── page.tsx                 landing: hero + demografi + peta
-│   ├── struktur/                halaman Struktur Pengurus (publik)
+│   ├── page.tsx                 landing page: hero + demographics + map
+│   ├── struktur/                Community Leaders page (public)
 │   ├── admin/
-│   │   ├── login/               gerbang auth (di luar shell admin)
-│   │   └── (protected)/         panel admin (dijaga middleware + RLS)
-│   │       ├── page.tsx         tabel & ekspor Data KK
-│   │       ├── mutasi/          Log Mutasi
-│   │       ├── struktur/        CRUD Struktur Pengurus
-│   │       └── settings/        ganti kata sandi
-│   └── auth/callback/           callback OAuth
-├── components/                  hero, chart (Recharts), peta (Leaflet), shell admin
+│   │   ├── login/               auth gate (outside the admin shell)
+│   │   └── (protected)/         admin panel (guarded by middleware + RLS)
+│   │       ├── page.tsx         Family Data table & export
+│   │       ├── mutasi/          Mutation Log
+│   │       ├── struktur/        Community Leaders CRUD
+│   │       └── settings/        change password
+│   └── auth/callback/           OAuth callback
+├── components/                  hero, charts (Recharts), map (Leaflet), admin shell
 ├── lib/
-│   ├── supabase/                client browser / server / middleware
-│   └── *-list.ts                master data dropdown (pekerjaan, hubungan, jabatan, mutasi)
-├── supabase/migrations/         schema, RLS, view agregat, storage bucket
+│   ├── supabase/                browser / server / middleware clients
+│   └── *-list.ts                dropdown master data (occupation, relation, position, mutation type)
+├── supabase/migrations/         schema, RLS, aggregate views, storage bucket
 └── next.config.ts
 ```
 
-## Menjalankan Secara Lokal
+## Running Locally
 
-### 1. Environment variable
+### 1. Environment variables
 
 ```bash
 cp .env.example .env.local
 ```
 
-Isi dari Supabase dashboard, menu Project Settings > API:
+Fill these in from the Supabase dashboard, Project Settings > API:
 
-| Variable | Keterangan |
+| Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL project Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key, aman dipakai di browser |
-| `SUPABASE_SERVICE_ROLE_KEY` | server-only, bypass RLS, dipakai skrip migrasi data saja, jangan pernah ikut ter-bundle ke browser |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key, safe to use in the browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | server-only, bypasses RLS, used only by data migration scripts, never bundle this into the browser |
 
-### 2. Dependency & dev server
+### 2. Dependencies & dev server
 
 ```bash
 npm install
@@ -112,30 +112,31 @@ npm run dev          # http://localhost:3000
 
 ### 3. Database
 
-Migrasi ada di `supabase/migrations/`. Terapkan ke project Supabase lewat
-CLI:
+Migrations live in `supabase/migrations/`. Apply them to a Supabase project
+through the CLI:
 
 ```bash
 supabase link --project-ref <project-ref>
 supabase db push
 ```
 
-## Batas Kelompok Usia
+## Age Group Boundaries
 
-| Kelompok | Rentang |
+| Group | Range |
 | --- | --- |
-| Usia Belajar | 0-14 |
-| Usia Produktif | 15-59 |
-| Lansia | 60+ |
+| School Age | 0-14 |
+| Productive Age | 15-59 |
+| Elderly | 60+ |
 
-Mengikuti UU No. 13 Tahun 1998, bukan cutoff 65 tahun ala BPS, supaya
-selaras dengan program riil di lapangan seperti Posyandu Lansia.
+Follows Law No. 13 of 1998, not the 65-year cutoff used by BPS (Indonesia's
+statistics agency), to stay aligned with real programs in the field such as
+the Elderly Posyandu (health post).
 
-## Tim
+## Team
 
-Program kerja individu KKN Tania di Dusun Mojo.
+Tania's individual KKN project in Dusun Mojo.
 
-| Orang | Bagian |
+| Person | Part |
 | --- | --- |
-| Tania | Pemilik program, data entry, setup infrastruktur (Supabase & Vercel), pengembangan fitur |
-| Hidayat | Bantu coding/development |
+| Tania | Project owner, data entry, infrastructure setup (Supabase & Vercel), feature development |
+| Hidayat | Helped with coding/development |
