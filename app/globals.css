@@ -38,4 +38,10 @@ body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+  }
 }

@@ -1,5 +1,6 @@
 import { DemografiSection } from "@/components/demografi-section";
 import { HeroSection, type HeroStats } from "@/components/hero-section";
+import { InfografisCtaSection } from "@/components/infografis-cta-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -39,6 +40,7 @@ export default async function Home() {
           ageByRt={(rtAgeData.data ?? []) as RtAgeBracketRow[]}
           pekerjaanByRt={(rtPekerjaanData.data ?? []) as RtPekerjaanRow[]}
         />
+        <InfografisCtaSection />
       </main>
       <SiteFooter />
     </>
