@@ -83,9 +83,7 @@ export function StrukturPageContent({ pengurus }: { pengurus: PengurusRow[] }) {
           </div>
 
           {featured.length > 0 ? (
-            <div
-              className={`mx-auto grid gap-6 ${featured.length === 2 ? "max-w-[1160px] sm:grid-cols-2" : "max-w-[560px]"}`}
-            >
+            <div className="mx-auto grid max-w-[560px] gap-6">
               {featured.map((p) => (
                 <StrukturKepalaCard key={p.id} pengurus={p} />
               ))}
