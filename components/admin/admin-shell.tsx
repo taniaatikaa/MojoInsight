@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin-logout-button";
 import { KAWUNG_TILE } from "@/lib/kawung-tile";
 
-type NavKey = "kk" | "mutasi" | "struktur" | "settings";
+type NavKey = "kk" | "mutasi" | "struktur" | "akun" | "settings";
 
 const NAV_ITEMS: { key: NavKey; href: string; label: string }[] = [
   { key: "kk", href: "/admin", label: "Data KK" },
   { key: "mutasi", href: "/admin/mutasi", label: "Log Mutasi" },
   { key: "struktur", href: "/admin/struktur", label: "Struktur Pengurus" },
+  { key: "akun", href: "/admin/akun", label: "Kelola Akun" },
   { key: "settings", href: "/admin/settings", label: "Pengaturan Akun" },
 ];
 
@@ -19,12 +20,14 @@ const PAGE_TITLES: Record<NavKey, string> = {
   kk: "Data Kartu Keluarga",
   mutasi: "Log Mutasi",
   struktur: "Struktur Pengurus",
+  akun: "Kelola Akun Admin",
   settings: "Pengaturan Akun",
 };
 
 function navKeyFromPath(pathname: string): NavKey {
   if (pathname.startsWith("/admin/mutasi")) return "mutasi";
   if (pathname.startsWith("/admin/struktur")) return "struktur";
+  if (pathname.startsWith("/admin/akun")) return "akun";
   if (pathname.startsWith("/admin/settings")) return "settings";
   return "kk";
 }
@@ -71,6 +74,14 @@ function NavIcon({ navKey }: { navKey: NavKey }) {
       <svg {...common}>
         <circle cx="12" cy="12" r="3" />
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    );
+  }
+  if (navKey === "akun") {
+    return (
+      <svg {...common}>
+        <path d="M12 2 4 5v6c0 5 3.4 8.6 8 11 4.6-2.4 8-6 8-11V5l-8-3z" />
+        <path d="M9.5 12l2 2 4-4" />
       </svg>
     );
   }
@@ -135,17 +146,20 @@ export function AdminShell({
   email,
   isSuperAdmin,
   rtId,
+  isAccountManager,
   children,
 }: {
   email: string;
   isSuperAdmin: boolean;
   rtId: number | null;
+  isAccountManager: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const activeNav = navKeyFromPath(pathname);
   const initials = getInitials(email);
+  const navItems = NAV_ITEMS.filter((item) => item.key !== "akun" || isAccountManager);
 
   return (
     <div className="flex min-h-screen bg-brand-bg">
@@ -186,7 +200,7 @@ export function AdminShell({
           </p>
 
           <nav className="flex flex-1 flex-col gap-0.5 px-3">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = activeNav === item.key;
               return (
                 <Link
